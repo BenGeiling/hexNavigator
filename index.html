@@ -1,0 +1,350 @@
+<!-- HEADER -->
+<head>
+	<!-- Set-up important tags + load css -->
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Ethnobotanical</title>
+	<meta name="robots" content="index" />
+	<meta name="author" content="Ethnobotanical" />
+	<link rel="stylesheet" type="text/css" href="main.css" media="screen" />
+
+	<!-- Load JS Libraries -->
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="raphael.js"></script>
+	<script type="text/javascript" src="scale.raphael.js"></script>
+	<script type="text/javascript" src="helvetica.js"></script>
+	<script type="text/javascript" src="kalocsai.js"></script>
+
+	<!-- Goggle Analytics -->
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-5279344-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+	<!-- Graphics -->
+	<script type="text/javascript">
+
+		// Startup
+		window.onload = startUp;
+
+		// Startup Function
+		function startUp() {
+			// Setup Global Variables
+			setupVariables();
+
+			// Define Global Variables
+			defineVariables();
+
+			// Setup Hexagon Hover Animations
+			for (x = 0; x <= 5; x++) {hexHitbox[x].hover(hexHoverOn, hexHoverOff);}
+
+			// Setup Hexagon Click Animations
+			for (x = 0; x <= 5; x++) {hexHitbox[x].click(hexClick);}
+
+			// Rotate The Hexagons To Starting Position To Reduce Lag
+			hexRotate("+", 0, 100, "out", "out");
+
+			hexPointer(0, "bottomleft", "setup", 124, 20, "lophophora williamsii", 144, 120, -31)
+			hexPointer(1, "bottomright", "setup", 100, 20, "pereskiopsis spathula", 147, 0, 32)
+			hexPointer(2, "topright", "setup", 100, 20, "pedicularis densiflora", 148, 0, 52)
+			hexPointer(3, "topright", "setup", 100, 20, "contact and information", 163, 0, 53)
+			hexPointer(4, "topleft", "setup", 100, 20, "lobelia inflata", 93, 92, 53)
+			hexPointer(5, "bottomleft", "setup", 100, 20, "acmella oleracea", 120, 120, -32)
+		}
+
+		// Setup Global Variables
+		function setupVariables() {
+
+			// Counters
+			window.x;
+			window.y;
+
+			// Raphael Canvas
+			window.containerCanvas;
+
+			// Cufon Fonts
+			window.fontHelvetica;
+			window.fontKalocsai;
+
+			// Offset For All Graphics
+			window.displacementX;
+			window.displacementY;
+
+			// Logo Text
+			window.logoTxt;
+
+			// Draw Hexagons
+			window.hexX = [];
+			window.hexY = [];
+			window.hexSize = [];
+			window.hexPointerFlag = [];
+			window.hexPointerFlagRect = [];
+			window.hexMain = [];
+			window.hexTxt = [];
+			window.background = [];
+			window.hexHitbox = [];
+
+			// Hexagon Animations
+			window.hexPop = [];
+			window.hexPulse;
+			window.hexOut;
+			window.hexIn;
+
+			window.hexSelected;
+			window.hexHovered;
+		}
+
+		function resizePaper(){
+			var win = $(this);
+			var location = document.getElementById("backing");
+			containerCanvas.changeSize(win.width(), win.height(), true, false);
+			if (win.width() > win.height()) {location.style.marginTop = (win.height() * 0.1) + "px";} else {location.style.marginTop = (win.width() * 0.1) + "px";}
+		}
+
+		// Define Variables
+		function defineVariables() {
+			// Counters
+			x = 0;
+			y = 0;
+
+			// Offset For All Graphics
+			displacementX = 1200/2;
+			displacementY = 350;
+
+			// Setup Raphael Canvas And Fonts
+			//containerCanvas = Raphael("backing");
+			containerCanvas = ScaleRaphael("backing", 1200, 1000);
+
+			resizePaper();
+			$(window).resize(resizePaper);
+
+			fontHelvetica = containerCanvas.getFont("Helvetica");
+			fontKalocsai = containerCanvas.getFont("Kalocsai");
+
+			// Draw Logo
+			logoTxt = containerCanvas.print((displacementX-175),(displacementY+225),"ETHNOBOTANICAL",fontHelvetica,50,"middle",0).attr({"fill": "#FFFFFF"});
+
+			// Hexagons
+			hexX[0] = displacementX; hexY[0] = displacementY + 100;
+			hexX[1] = displacementX + 86.5; hexY[1] = displacementY + 50;
+			hexX[2] = displacementX + 86.5; hexY[2] = displacementY - 50;
+			hexX[3] = displacementX; hexY[3] = displacementY - 100;
+			hexX[4] = displacementX - 86.5; hexY[4] = displacementY - 50;
+			hexX[5] = displacementX - 86.5; hexY[5] = displacementY + 50;
+
+			for (x = 0; x <=5; x++) {hexSize[x] = 50;}
+			for (x = 0; x <=5; x++) {hexMain[x] = containerCanvas.hexagon(hexX[x],hexY[x],hexSize[x], -1).attr({"opacity": 1, "fill-opacity": 0.5, "fill": "#000000", "stroke": "#FFFFFF", "stroke-width": 3});}
+
+
+			hexTxt[0] = containerCanvas.print(hexX[0]-33.5,hexY[0],"A",fontKalocsai,85,"middle",0);
+			hexTxt[1] = containerCanvas.print(hexX[1]-31,hexY[1],"R",fontKalocsai,85,"middle",0);
+			hexTxt[2] = containerCanvas.print(hexX[2]-32.5,hexY[2],"T",fontKalocsai,85,"middle",0);
+			hexTxt[3] = containerCanvas.print(hexX[3]-40,hexY[3]+10,"@",fontHelvetica,85,"middle",0);
+			hexTxt[4] = containerCanvas.print(hexX[4]-34,hexY[4],"L",fontKalocsai,85,"middle",0);
+			hexTxt[5] = containerCanvas.print(hexX[5]-34,hexY[5],"U",fontKalocsai,85,"middle",0);
+			for (x = 0; x <=5; x++) {hexTxt[x].attr({"fill": "#FFFFFF", "opacity": 1});}
+
+			// Hexagon Hitbox
+			for (x = 0; x <=5; x++) {hexHitbox[x] = containerCanvas.hexagon(hexX[x],hexY[x],hexSize[x], -1).attr({"opacity": 0, "fill": "#000000", "stroke": "#FFFFFF", "stroke-width": 3, "cursor": "pointer"});}
+
+			// Hexagon Animations
+			for (x = 0; x <=5; x++) {hexPop[x] = Raphael.animation({"50%":{"path": hexagonPath(hexX[x],hexY[x],hexSize[x]*1.1,"",-1,1)},"100%":{"path": hexagonPath(hexX[x],hexY[x],hexSize[x],"",-1,1)}}, 300);}
+			hexPulse = Raphael.animation({"1%":{"fill-opacity": 0},"2%":{"fill": "#FFFC00"},"20%":{"fill-opacity": 1},"60%":{"fill-opacity": 0.5},"100%":{"fill": "#000000"}}, 1000);
+			hexOut = Raphael.animation({"opacity": 0}, 500);
+			hexIn = Raphael.animation({"opacity": 1}, 500);
+
+			hexSelected = -1;
+			hexHovered = -1;
+		}
+
+		// Creates A Hexagon Using Rapheal
+		Raphael.fn.hexagon = function(posX, posY, radius, sideValue) {return hexagonPath(posX, posY, radius, this, sideValue, 0);}
+
+		// Creates A Hexagon Path
+		function hexagonPath(posX, posY, radius, object, sideValue, kind) {
+			var path = ""
+			for (var i = 0; i <= 7; i++) {
+				var a = i * 60,
+				x = radius * Math.cos(a * Math.PI / 180) + posX,
+				y = radius * Math.sin(a * Math.PI / 180) + posY
+				if (sideValue == -1) {path += (i == 0 ? "M" : "L") + x + "," + y}
+					else if (i == sideValue || i == (sideValue - 1)) {path += (i == (sideValue - 1) ? "M" : "L") + x + "," + y}
+			}
+			if (kind == 0) {return object.path(path);} else if (kind == 1) {return (path);}
+		}
+
+		// Creates A Hexagon Hover On Animation
+		function hexHoverOn() {
+			if (hexSelected == -1) {
+				for (x = 0; x <= 5; x++) {if (this == hexHitbox[x]) {y = x;}}
+					hexHovered = y;
+
+				hexMain[hexHovered].animate(hexPulse); hexMain[hexHovered].animate(hexPop[hexHovered]);
+
+			} else {
+				for (x = 0; x <= 5; x++) {if (this == hexHitbox[x]) {y = x;}}
+					hexHovered = y;
+
+				hexMain[hexHovered].animate(hexPulse); hexMain[hexHovered].animate(hexPop[hexHovered]);
+			}
+		}
+
+		// Creates A Hexagon Hover Off Animation
+		function hexHoverOff() {}
+
+		// Creates A Hexagon Click Animation
+		function hexClick() {
+			if (hexSelected == -1) {
+				for (x = 0; x <= 5; x++) {if (this == hexHitbox[x]) {y = x;}}
+					hexSelected = y;
+
+				if (hexSelected == 0) {hexRotate("+", 180, 900, "in", "in");}
+				if (hexSelected == 1) {hexRotate("-", 120, 600, "in", "in");}
+				if (hexSelected == 2) {hexRotate("-", 60, 300, "in", "in");}
+				if (hexSelected == 3) {hexRotate("-", 0, 0, "in", "in");}
+				if (hexSelected == 4) {hexRotate("+", 60, 300, "in", "in");}
+				if (hexSelected == 5) {hexRotate("+", 120, 600, "in", "in");}
+			} else {
+				if (hexSelected == 0) {hexRotate("+", 0, 900, "in", "out");}
+				if (hexSelected == 1) {hexRotate("+", 0, 600, "in", "out");}
+				if (hexSelected == 2) {hexRotate("+", 0, 300, "in", "out");}
+				if (hexSelected == 3) {hexRotate("-", 0, 0, "in", "out");}
+				if (hexSelected == 4) {hexRotate("+", 0, 300, "in", "out");}
+				if (hexSelected == 5) {hexRotate("+", 0, 600, "in", "out");}
+
+				hexSelected = -1;
+			}
+		}
+
+		// Draw A Hexagon Pointer
+		function hexPointer(hexIndex, side, style, x, y, text, length, rectX, rectY) { // side = bottomright/topright/bottomleft/bottomright; style = setup/in/out; x = 200,285; y = 20, 100
+			if (style == "setup") {
+				if (side == "bottomright") {
+					background[hexIndex] = containerCanvas.path("M"+hexX[hexIndex]+","+(hexY[hexIndex]+42));
+					hexPointerFlagRect[hexIndex] = containerCanvas.rect((hexX[hexIndex]+x+rectX),(hexY[hexIndex]+y+rectY),length,21).attr({"stroke-width": 1, "stroke": "#FFFFFF", "fill": "#000000", "fill-opacity": 0.5, "opacity": 0});
+					hexPointerFlag[hexIndex] = containerCanvas.print((hexX[hexIndex]+x+5),(hexY[hexIndex]+43+y),text,fontHelvetica,15,"start",0).attr({"fill": "#FFFFFF", "opacity": 0});
+				} else if (side == "topright") {
+					background[hexIndex] = containerCanvas.path("M"+hexX[hexIndex]+","+(hexY[hexIndex]-42));
+					hexPointerFlagRect[hexIndex] = containerCanvas.rect((hexX[hexIndex]+x+rectX),(hexY[hexIndex]-y-rectY),length,21).attr({"stroke-width": 1, "stroke": "#FFFFFF", "fill": "#000000", "fill-opacity": 0.5, "opacity": 0});
+					hexPointerFlag[hexIndex] = containerCanvas.print((hexX[hexIndex]+x+5),(hexY[hexIndex]-41-y),text,fontHelvetica,15,"start",0).attr({"fill": "#FFFFFF", "opacity": 0});
+				} else if (side == "bottomleft") {
+					background[hexIndex] = containerCanvas.path("M"+hexX[hexIndex]+","+(hexY[hexIndex]+42));
+					hexPointerFlagRect[hexIndex] = containerCanvas.rect((hexX[hexIndex]-x-rectX),(hexY[hexIndex]+y-rectY),length,21).attr({"stroke-width": 1, "stroke": "#FFFFFF", "fill": "#000000", "fill-opacity": 0.5, "opacity": 0});
+					hexPointerFlag[hexIndex] = containerCanvas.print((hexX[hexIndex]-x-115),(hexY[hexIndex]+43+y),text,fontHelvetica,15,"start",0).attr({"fill": "#FFFFFF", "opacity": 0});
+				} else if (side == "topleft") {
+					background[hexIndex] = containerCanvas.path("M"+hexX[hexIndex]+","+(hexY[hexIndex]-42));
+					hexPointerFlagRect[hexIndex] = containerCanvas.rect((hexX[hexIndex]-x-rectX),(hexY[hexIndex]-y-rectY),length,21).attr({"stroke-width": 1, "stroke": "#FFFFFF", "fill": "#000000", "fill-opacity": 0.5, "opacity": 0});
+					hexPointerFlag[hexIndex] = containerCanvas.print((hexX[hexIndex]-x-90),(hexY[hexIndex]-41-y),text,fontHelvetica,15,"start",0).attr({"fill": "#FFFFFF", "opacity": 0});
+				}
+					background[hexIndex].attr({"stroke-width": 1, "stroke": "#FFFFFF", "opacity": 0});
+			} else if (style == "in") {
+				hexPointerFlag[hexIndex].stop();
+				hexPointerFlag[hexIndex].attr("opacity", 0);
+				hexPointerFlagRect[hexIndex].attr("opacity", 0);
+				background[hexIndex].stop();
+
+				if (side == "bottomright") {background[hexIndex].animate({"10%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)+"V"+(hexY[hexIndex]+42+y)+"H"+(hexX[hexIndex]+x)},"50%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)+"V"+(hexY[hexIndex]+42+y)},"100%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)}},300);}
+					else if (side == "topright") {background[hexIndex].animate({"10%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)+"V"+(hexY[hexIndex]-42-y)+"H"+(hexX[hexIndex]+x)},"50%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)+"V"+(hexY[hexIndex]-42-y)},"100%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)}},300);}
+					else if (side == "bottomleft") {background[hexIndex].animate({"10%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)+"V"+(hexY[hexIndex]+42+y)+"H"+(hexX[hexIndex]-x)},"50%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)+"V"+(hexY[hexIndex]+42+y)},"100%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)}},300);}
+					else if (side == "topleft") {background[hexIndex].animate({"10%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)+"V"+(hexY[hexIndex]-42-y)+"H"+(hexX[hexIndex]-x)},"50%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)+"V"+(hexY[hexIndex]-42-y)},"100%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)}},300);}
+			} else if (style == "out") {
+
+				hexPointerFlag[hexIndex].animate({"75%":{"opacity": 0},"100%":{"opacity": 1}},400);
+				hexPointerFlagRect[hexIndex].animate({"75%":{"opacity": 0},"100%":{"opacity": 1}},400);
+				background[hexIndex].attr("opacity", 1);
+
+				if (side == "bottomright") {background[hexIndex].animate({"50%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)+"V"+(hexY[hexIndex]+42+y)},"100%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)+"V"+(hexY[hexIndex]+42+y)+"H"+(hexX[hexIndex]+x)}},300);}
+					else if (side == "topright") {background[hexIndex].animate({"50%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)+"V"+(hexY[hexIndex]-42-y)},"100%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)+"V"+(hexY[hexIndex]-42-y)+"H"+(hexX[hexIndex]+x)}},300);}
+					else if (side == "bottomleft") {background[hexIndex].animate({"50%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)+"V"+(hexY[hexIndex]+42+y)},"90%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]+42)+"V"+(hexY[hexIndex]+42+y)+"H"+(hexX[hexIndex]-x)}},300);}
+					else if (side == "topleft") {background[hexIndex].animate({"50%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)+"V"+(hexY[hexIndex]-42-y)},"90%":{path: "M"+hexX[hexIndex]+","+(hexY[hexIndex]-42)+"V"+(hexY[hexIndex]-42-y)+"H"+(hexX[hexIndex]-x)}},300);}
+			}
+		}
+
+		function hexPointerOut(shade) {
+
+			if (hexSelected == -1) {
+			//	hexPointer(0, "bottomleft", "setup", 124, 20, "lophophora williamsii", 144, 120, -31)
+			//	hexPointer(1, "bottomright", "setup", 100, 20, "pereskiopsis spathula", 147, 0, 32)
+			//	hexPointer(2, "topright", "setup", 100, 20, "pedicularis densiflora", 148, 0, 52)
+			//	hexPointer(3, "topright", "setup", 100, 20, "contact and information", 163, 0, 53)
+			//	hexPointer(4, "topleft", "setup", 100, 20, "lobelia inflata", 93, 92, 53)
+			//	hexPointer(5, "bottomleft", "setup", 100, 20, "acmella oleracea", 120, 120, -32)
+			} else if (hexSelected == 0) {
+			//	hexPointer(0, "bottomleft", "setup", 200, 20, "ben@ethnobotanical.ca");
+			//	hexPointer(1, "bottomright", "setup", 285, 20, "Grafted or tissue culture grown plants are \navaiable sizes from 1-4 cm. Grafted or tissue culture grown plants are \navaiable sizes from 1-4 cm.");
+			//	hexPointer(2, "topright", "setup", 200, 20, "20 CAD per plant");
+			//	hexPointer(3, "topright", "setup", 200, 20, "lophophora williamsii");
+			//	hexPointer(4, "topleft", "setup", 285, 20, "IMAGES");
+			//	hexPointer(5, "bottomleft", "setup", 200, 20, "shipping of plants within Canada only");
+			}
+			hexPointer(0, "bottomleft", "out", 100, 20, "", 144);
+			hexPointer(1, "bottomright", "out", 100, 20, "", 153);
+			hexPointer(2, "topright", "out", 100, 20, "", 148);
+			hexPointer(3, "topright", "out", 100, 20, "", 163);
+			hexPointer(4, "topleft", "out", 100, 20, "", 93);
+			hexPointer(5, "bottomleft", "out", 100, 20, "", 120);
+			hexShade(shade);
+		}
+
+		function hexRotate(direction, degrees, time, style, shade) {
+
+			if (style == "in") {
+				hexPointer(0, "bottomleft", "in", 100, 20, "", 144);
+				hexPointer(1, "bottomright", "in", 100, 20, "", 153);
+				hexPointer(2, "topright", "in", 100, 20, "", 148);
+				hexPointer(3, "topright", "in", 100, 20, "", 163);
+				hexPointer(4, "topleft", "in", 100, 20, "", 93);
+				hexPointer(5, "bottomleft", "in", 100, 20, "", 120);
+
+				setTimeout(function() {hexRotate(direction, degrees, time, "out", shade)}, 300);
+				return;
+			}
+
+			if (direction == "+") {
+				hexMain[0].animate({transform: "R"+degrees+","+hexX[0]+","+(hexY[0]-100)}, time);
+				hexTxt[0].animate({transform: "R"+degrees+","+hexX[0]+","+(hexY[0]-100)+"R-"+degrees}, time);
+				hexHitbox[0].animate({transform: "R"+degrees+","+hexX[0]+","+(hexY[0]-100)}, time, function() {hexPointerOut(shade)});
+
+				for (x = 1; x <= 5; x++) {
+					hexMain[x].animate({transform: "R"+degrees+","+hexX[0]+","+(hexY[0]-100)}, time);
+					hexTxt[x].animate({transform: "R"+degrees+","+hexX[0]+","+(hexY[0]-100)+"R-"+degrees}, time);
+					hexHitbox[x].animate({transform: "R"+degrees+","+hexX[0]+","+(hexY[0]-100)}, time);
+				}
+			} else if (direction == "-") {
+				hexMain[0].animate({transform: "R-"+degrees+","+hexX[0]+","+(hexY[0]-100)}, time);
+				hexTxt[0].animate({transform: "R-"+degrees+","+hexX[0]+","+(hexY[0]-100)+"R"+degrees}, time);
+				hexHitbox[0].animate({transform: "R-"+degrees+","+hexX[0]+","+(hexY[0]-100)}, time, function() {hexPointerOut(shade)});
+
+				for (x = 1; x <= 5; x++) {
+					hexMain[x].animate({transform: "R-"+degrees+","+hexX[0]+","+(hexY[0]-100)}, time);
+					hexTxt[x].animate({transform: "R-"+degrees+","+hexX[0]+","+(hexY[0]-100)+"R"+degrees}, time);
+					hexHitbox[x].animate({transform: "R-"+degrees+","+hexX[0]+","+(hexY[0]-100)}, time);
+				}
+			}
+		}
+
+		function hexShade(style) {
+		//	if (style == "in") {
+			//	if (hexSelected != 0) {hexTxt[0].attr("opacity", 0.5);}
+			//	if (hexSelected != 1) {hexTxt[1].attr("opacity", 0.5);}
+			//	if (hexSelected != 2) {hexTxt[2].attr("opacity", 0.5);}
+			//	if (hexSelected != 3) {hexTxt[3].attr("opacity", 0.5);}
+			//	if (hexSelected != 4) {hexTxt[4].attr("opacity", 0.5);}
+			//	if (hexSelected != 5) {hexTxt[5].attr("opacity", 0.5);}
+		//	} else if (style == "out") {
+			//	for (x = 0; x <= 5; x++) {hexTxt[x].attr("opacity", 1);}
+		//	}
+		}
+
+
+	</script>
+</head>
+
+<!-- BODY -->
+<body><div id="backing"></div></body>
